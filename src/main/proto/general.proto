@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+
+option java_package = "com.example.gateway.proto";
+option java_outer_classname = "General";
+
+package example;
+
+//ID:1
+message Response {
+    uint32 result = 1;
+    string message = 2;
+}
+
+// 登录
+//ID:101
+message LoginRequest {
+    uint32 userId = 1;
+    string token = 2; // token or password
+}
+
+//ID:102
+message LoginResponse {
+    uint32 userId = 1;
+    uint32 result = 2;
+}
+
+//ID:109
+message LogoutRequest {
+
+}
+
+//ID:2
+message HeartBeat {
+    uint32 userId = 1;
+    uint32 type = 2;
+}
+

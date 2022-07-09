@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "com.example.gateway";
+
+package pb;
+
+message Empty {
+
+}

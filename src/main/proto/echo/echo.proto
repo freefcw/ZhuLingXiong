@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+
+option java_package = "com.example.client.proto";
+option java_outer_classname = "Echo";
+
+package echo;
+
+message NewEchoMessage {
+  string content = 1;
+  uint32 ts = 2;
+}
+
+message EchoResponse {
+  string content = 1;
+  uint32 ts = 2;
+}
+

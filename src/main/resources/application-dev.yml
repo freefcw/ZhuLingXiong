@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    root: info
+    io:
+      etcd:
+        jetcd: debug
+    com:
+      example:
+        gateway:
+          upstream: debug
+etcd:
+  endpoints: http://127.0.0.1:2379

@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+option java_package = "com.example.gateway";
+option java_outer_classname = "ManagementProto";
+
+package pb.management;
+
+import "type.proto";
+
+service Stat {
+  rpc GetOnlineUsers(Empty) returns (OnlineUsers) {}
+
+  rpc GetStat(Empty) returns (GatewayStat) {}
+
+  rpc GetModules(Empty) returns (ModuleList) {}
+}
+
+service Message {
+  rpc SendMessage(MessageRequest) returns (Response) {}
+}
+
+
+
+message Response {
+  int32 code = 1;
+  string message = 2;
+}
+
+message OnlineUsers {
+  repeated int32 users = 1;
+}
+
+message MessageRequest {
+  string jwt = 1;
+  int32 commandId = 2;
+  MessageType type = 3;
+  string payload = 4;
+}
+
+enum MessageType {
+  Text = 0;
+  Bytes = 1;
+}
+
+message Module {
+  string name = 1;
+  ModuleType type = 2;
+  string ip = 3;
+  int32 port = 4;
+  int32 commandStart = 5;
+  int32 commandEnd = 6;
+}
+
+enum ModuleType {
+  Internal = 0;
+  Proxy = 1;
+  Forward = 2;
+}
+
+message ModuleList {
+  repeated Module modules = 1;
+}
+
+message GatewayStat {
+  int32 total = 1;
+}

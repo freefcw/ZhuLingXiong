@@ -1,0 +1,23 @@
+jwt:
+  key: HsTK2Y4fdIx3ZM9xEOX4Nc0rDePvZHxM
+logging:
+  level:
+    root: info
+
+netty:
+  ip: 0.0.0.0
+  port: 7769
+  boss-count: 4
+  worker-count: 8
+  keep-alive: true
+  backlog: 128
+  use-linux-epoll: true
+  check-buffer-lack: false
+
+etcd:
+  endpoints: http://127.0.0.1:2379
+
+server:
+  port: 8086
+  shutdown: graceful
+

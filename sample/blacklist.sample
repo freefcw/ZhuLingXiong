@@ -1,0 +1,5 @@
+# black list
+# export ETCDCTL_API=3
+
+etcdctl put /gateway/blacklist/192.168.0.202 1
+etcdctl del /gateway/blacklist/192.168.0.202
