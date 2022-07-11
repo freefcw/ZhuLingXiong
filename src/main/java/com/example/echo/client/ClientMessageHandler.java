@@ -33,12 +33,10 @@ public class ClientMessageHandler extends SimpleChannelInboundHandler<BaseMessag
             synchronized (ctx.channel()) {
                 ctx.channel().notify();
             }
-
         }
         if (msg.commandId() == EchoActionType.ECHO_RESPONSE.id()) {
             Echo.EchoResponse echoResponse = Echo.EchoResponse.parseFrom(msg.payload().nioBuffer());
-            log.info("receive echo response: {}", echoResponse.getContent());
-            log.info("receive message: {} {}", echoResponse.getTs(), echoResponse.getContent());
+            log.info("receive message: {} @ {}", echoResponse.getContent(),  echoResponse.getTs());
         }
     }
 

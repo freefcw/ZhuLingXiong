@@ -1,7 +1,7 @@
 #etcdctl put /gateway/modules/xxxx '{"name":"xxxx","commandStart":7002,"commandEnd":7008,"type":1,"ip":"127.0.0.1","port":8080}'
 
-etcdctl put /gateway/modules/chat '{"name":"chat","commandStart":6000,"commandEnd":6999,"type":1,"ip":"127.0.0.1","port":9933}'
-
+# register a module
 etcdctl put /gateway/modules/echo '{"name":"echo","commandStart":201,"commandEnd":220,"type":1,"ip":"127.0.0.1","port":9933}'
 
+# deregister a module
 etcdctl del /gateway/modules/xxxx

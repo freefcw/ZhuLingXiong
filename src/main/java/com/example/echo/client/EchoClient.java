@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 public class EchoClient {
@@ -25,11 +24,13 @@ public class EchoClient {
 
     public static void main(String[] args) throws InterruptedException {
         EchoClient client = new EchoClient();
-        client.run("127.0.0.1", 7769);
+        String host = "127.0.0.1";
+        Integer port = 7769;
+        client.run(host, port);
     }
 
     public void run(String host, Integer port) throws InterruptedException {
-        ChannelFuture future = getChannelFuture(host, port);
+        ChannelFuture future = this.getChannelFuture(host, port);
         EchoService echoService = new EchoService(future);
         Integer userId = 24202421;
 
@@ -43,11 +44,17 @@ public class EchoClient {
         });
 
         synchronized (future.channel()) {
-            log.info("enter wait...");
             future.channel().wait();
-            log.info("wait break!");
+            executor.shutdown();
         }
 
+        if (!echoService.isLoggedIn()) {
+            log.error("login failed!");
+            this.connectionFactory.close();
+            return;
+        } else {
+            log.info("login success, continue...");
+        }
 
         echoService.sendHello(userId);
 
@@ -59,14 +66,6 @@ public class EchoClient {
             }
             echoService.send(next);
         }
-        // test to bytes
-//            BaseMessage message1 = makeChatMessage(next);
-//            log.info("bytes {}", message1.getContentBytes());
-//            log.info("byteBuff {}", message1.getContentBytes().asReadOnlyByteBuffer());
-//
-//            String encodingStr = Base64.getEncoder().encodeToString(message1.toByteArray());
-//            log.info("base64 {}", encodingStr);
-
     }
 
     private ChannelFuture getChannelFuture(String host, Integer port) {
@@ -78,6 +77,8 @@ public class EchoClient {
                 log.error("connect failed!");
             }
         });
+        future.channel().closeFuture().addListener(future1 -> log.info("closing future"));
+
         return future;
     }
 

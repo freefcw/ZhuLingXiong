@@ -31,12 +31,12 @@ public class EchoServer {
     }
 
     public void start() throws InterruptedException {
-        bossGroup = new NioEventLoopGroup(BIZ_GROUP_SIZE);
-        workerGroup = new NioEventLoopGroup(BIZ_THREAD_SIZE);
+        this.bossGroup = new NioEventLoopGroup(BIZ_GROUP_SIZE);
+        this.workerGroup = new NioEventLoopGroup(BIZ_THREAD_SIZE);
         try {
             ServerBootstrap b = new ServerBootstrap();
 
-            b.group(bossGroup, workerGroup);
+            b.group(this.bossGroup, this.workerGroup);
             b.channel(NioServerSocketChannel.class);
             b.childHandler(this.buildInitializer());
 
@@ -46,15 +46,11 @@ public class EchoServer {
 
             future.channel().closeFuture().sync();
         } finally {
-            bossGroup.shutdownGracefully();
-            if (workerGroup != null) {
-                workerGroup.shutdownGracefully();
-            }
+            this.shutdown();
         }
     }
 
     private ChannelHandler buildInitializer() {
-        EchoHandler handler = new EchoHandler();
         return new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) {
@@ -62,7 +58,7 @@ public class EchoServer {
 
                 pipeline.addLast(new MessageDecoder());
                 pipeline.addLast(new MessageEncoder());
-                pipeline.addLast(handler);
+                pipeline.addLast(new EchoHandler());
             }
         };
     }

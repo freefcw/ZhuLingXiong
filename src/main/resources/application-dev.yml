@@ -13,5 +13,7 @@ logging:
       example:
         gateway:
           upstream: debug
+          server:
+            handler: debug
 etcd:
   endpoints: http://127.0.0.1:2379

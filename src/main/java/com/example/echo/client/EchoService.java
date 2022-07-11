@@ -12,8 +12,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.util.Attribute;
 import lombok.extern.slf4j.Slf4j;
 
-
-import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -41,8 +39,6 @@ public class EchoService {
     }
 
     public ScheduledFuture<?> sendHello(Integer uid) {
-        // message send to server
-        // 延迟50ms再发送消息给服务器，正常情况下，这个延迟基本可以保证认证通过了
         return channel.eventLoop().schedule(() -> {
             if (channel.hasAttr(SessionKey.USER_ID)) {
                 BaseMessage message2 = makeEchoMessage("message from user " + uid);
@@ -76,8 +72,7 @@ public class EchoService {
         Echo.NewEchoMessage.Builder builder = Echo.NewEchoMessage
                 .newBuilder()
                 .setTs((int) (System.currentTimeMillis() / 1000))
-                .setContent(next)
-                ;
+                .setContent(next);
         BaseMessage message = MessageFactory.make(EchoActionType.NEW_ECHO_REQUEST.id());
         Echo.NewEchoMessage message1 = builder.build();
         message.setPayload(message1);
@@ -93,6 +88,11 @@ public class EchoService {
         message.setPayload(builder.build());
 
         return message;
+    }
+
+    public boolean isLoggedIn() {
+        Attribute<Integer> userIdAttr = this.channel.attr(SessionKey.USER_ID);
+        return userIdAttr.get() != null;
     }
 
 }
