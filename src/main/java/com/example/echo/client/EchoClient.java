@@ -6,8 +6,6 @@ import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
 
-import java.util.Objects;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,37 +13,34 @@ import java.util.concurrent.Executors;
 public class EchoClient {
     private final ConnectionFactory connectionFactory;
     private final JwtService jwtService;
+    private final Integer port;
+    private final String host;
+    private final ExecutorService executor;
 
-    public EchoClient() {
+    public EchoClient(String host, Integer port, String authKey) {
+        this.host = host;
+        this.port = port;
         this.connectionFactory = new ConnectionFactory();
-        this.jwtService = new JwtService();
-        this.jwtService.setKey("HsTK2Y4fdIx3ZM9xEOX4Nc0rDePvZHxM");
+        this.jwtService = new JwtService(authKey);
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        EchoClient client = new EchoClient();
-        String host = "127.0.0.1";
-        Integer port = 7769;
-        client.run(host, port);
-    }
+    public void run(Integer userId, InputSource inputSource) throws InterruptedException {
+        ChannelFuture future = this.connectionFactory.create(host, port);
 
-    public void run(String host, Integer port) throws InterruptedException {
-        ChannelFuture future = this.getChannelFuture(host, port);
         EchoService echoService = new EchoService(future);
-        Integer userId = 24202421;
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
+        this.executor.execute(() -> {
             try {
-                echoService.login(userId, this.jwtService.toJwt(new AuthInfo(userId, LocalDateTime.now().plusDays(3).toDate())));
+                echoService.login(userId, this.buildToken(userId));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
 
+        // wait for auth response
         synchronized (future.channel()) {
             future.channel().wait();
-            executor.shutdown();
         }
 
         if (!echoService.isLoggedIn()) {
@@ -56,30 +51,17 @@ public class EchoClient {
             log.info("login success, continue...");
         }
 
-        echoService.sendHello(userId);
+        echoService.send("message from user " + userId);
+        inputSource.handle(echoService);
+    }
 
-        while (true) {
-            Scanner scanner = new Scanner(System.in);
-            String next = scanner.nextLine();
-            if (Objects.equals(next, "exit")) {
-                return;
-            }
-            echoService.send(next);
+    private String buildToken(Integer userId) {
+        return this.jwtService.toJwt(new AuthInfo(userId, LocalDateTime.now().plusDays(3).toDate()));
+    }
+
+    public void close() {
+        if (this.executor != null) {
+            this.executor.shutdown();
         }
     }
-
-    private ChannelFuture getChannelFuture(String host, Integer port) {
-        ChannelFuture future = this.connectionFactory.create(host, port);
-        future.addListener(future1 -> {
-            if (future1.isSuccess()) {
-                log.info("connect success");
-            } else {
-                log.error("connect failed!");
-            }
-        });
-        future.channel().closeFuture().addListener(future1 -> log.info("closing future"));
-
-        return future;
-    }
-
 }

@@ -47,7 +47,17 @@ public class ModuleManager {
 
     public boolean registerModule(ModuleProperty property) {
         log.info("registerModule module with property {}", property);
+        if (this.hasModule(property.getName())) {
+            log.info("module {} is exist, will replace", property.getName());
+        }
+        this.deregisterModule(property.getName());
         return this.registerModule(this.moduleBuilder.buildWithProperty(property));
+    }
+
+    public boolean hasModule(String name) {
+        return this.moduleList.stream().anyMatch(gatewayModule -> {
+            return gatewayModule.name().equals(name);
+        });
     }
 
 

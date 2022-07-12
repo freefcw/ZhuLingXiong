@@ -36,7 +36,7 @@ public class ClientMessageHandler extends SimpleChannelInboundHandler<BaseMessag
         }
         if (msg.commandId() == EchoActionType.ECHO_RESPONSE.id()) {
             Echo.EchoResponse echoResponse = Echo.EchoResponse.parseFrom(msg.payload().nioBuffer());
-            log.info("receive message: {} @ {}", echoResponse.getContent(),  echoResponse.getTs());
+            log.info("receive message: {} @ {}", echoResponse.getContent(), echoResponse.getTs());
         }
     }
 

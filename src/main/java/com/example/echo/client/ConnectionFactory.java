@@ -40,9 +40,15 @@ public class ConnectionFactory {
             if (future1.isSuccess()) {
                 log.info("connect {}:{} success", host, port);
             } else {
-                log.error("connect {}:{} failed {}", host, port, future1.cause().getMessage());
+                log.error("connect {}:{} failed {}, will terminal...", host, port, future1.cause().getMessage());
+                this.close();
             }
         });
+
+        future.channel().closeFuture().addListener(future1 -> {
+            log.info("closing future");
+        });
+
         return future;
     }
 

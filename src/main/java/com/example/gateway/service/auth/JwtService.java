@@ -17,6 +17,13 @@ public class JwtService {
 
     private Integer periodDays = 3;
 
+    public JwtService() {
+    }
+
+    public JwtService(String key) {
+        this.setKey(key);
+    }
+
     @Value("${jwt.key:mBWP2sVN9Bmw3mQhAwhF2R6CF7oHzX8G}")
     public void setKey(String key) {
         this.key = Keys.hmacShaKeyFor(key.getBytes());
@@ -41,10 +48,9 @@ public class JwtService {
     public String toJwt(AuthInfo authInfo) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration = now.plusDays(this.periodDays);
-        String jwt = Jwts.builder().setId(authInfo.getUserId().toString())
+        return Jwts.builder().setId(authInfo.getUserId().toString())
 //                .setSubject(userDetails.getId().toString())
 //                .setIssuedAt(now.toDate())
                 .setExpiration(expiration.toDate()).signWith(this.key).compact();
-        return jwt;
     }
 }

@@ -12,11 +12,10 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.util.Attribute;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class EchoService {
+public class EchoService implements MessageSender {
     private final ChannelFuture channelFuture;
     private final Channel channel;
 
@@ -36,17 +35,6 @@ public class EchoService {
             }
         });
         loginFuture.sync().addListener((ChannelFutureListener) future12 -> log.info("login request done!"));
-    }
-
-    public ScheduledFuture<?> sendHello(Integer uid) {
-        return channel.eventLoop().schedule(() -> {
-            if (channel.hasAttr(SessionKey.USER_ID)) {
-                BaseMessage message2 = makeEchoMessage("message from user " + uid);
-                channel.writeAndFlush(message2);
-            } else {
-                log.error("request is not auth! {}", channel.id().asShortText());
-            }
-        }, 50, TimeUnit.MILLISECONDS);
     }
 
     public void send(String msg) {
